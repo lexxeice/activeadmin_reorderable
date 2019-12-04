@@ -18,7 +18,8 @@ $.fn.reorderable = function(opts) {
   }
 
   function reorderableTableStop(e, ui) {
-    var $row    = ui.item,
+    var currentPosition, newPosition, nextPosition, prevPosition,
+        $row    = ui.item,
         $rows   = $row.parent().children('tr'),
         $table  = $row.closest('table'),
         $handle = $row.find('.reorder-handle'),
@@ -40,11 +41,23 @@ $.fn.reorderable = function(opts) {
       $row.addClass(newClass);
     });
 
-    $rows.each(function() {
-      $(this).find('.position').text(index($(this)));
-    });
+    currentPosition = $row.find(".col-position").text();
+    prevPosition = $row.prev().find(".col-position").text();
+    nextPosition = $row.next().find(".col-position").text();
 
-    $.post(url, { position: index($row) });
+    if ( currentPosition < nextPosition ) {
+      newPosition = prevPosition;
+    } else {
+      newPosition = nextPosition || prevPosition;
+    }
+
+    console.log(currentPosition)
+
+    $row.find('.col-position').text(newPosition);
+
+    $.post(url, { position: newPosition }, function () {
+      window.location.reload();
+    });
   }
 
   return this.each(function() {
